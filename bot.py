@@ -1,43 +1,25 @@
-import logging
-from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackContext
+from requests import Request, Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
 
+api_token = 'd6d46302-3592-455d-ac29-2d60b0787950'
+url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+parameters = {
+    'start': '1',
+    'limit': '1',
+    'convert': 'USD'
+}
+headers = {
+    'Accepts': 'application/json',
+    'X-CMC_PRO_API_KEY': 'd6d46302-3592-455d-ac29-2d60b0787950',
+}
 
-def echo(update, context):
-    if update.effective_chat.type == 'channel':
-        print(update)
-        print(update['channel_post'])
-        print(update['channel_post']['chat'])
-        print(update.effective_chat)
-    else:
-        print(update.effective_chat)
-        print('*** PV msm ***')
+session = Session()
+session.headers.update(headers)
 
-
-def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm Amir's bot, please talk to me!"
-                                                                    "\n$=27750, EUR=32646, GBP=37509")
-
-
-def caps(update, context):
-    text_caps = ' '.join(context.args).upper()
-    print(text_caps)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
-
-
-def unknown(update, context: CallbackContext):
-
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
-
-
-with open('config.txt', 'r') as conf:
-    token = conf.readline()
-    conf.close()
-
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-updater = Updater(token=token)
-dispatcher = updater.dispatcher
-
-echo_handler = MessageHandler(Filters.all, echo)
-dispatcher.add_handler(echo_handler)
-
-updater.start_polling()
+try:
+    response = session.get(url, params=parameters)
+    data = json.loads(response.text)
+    print(data['data'][0]['quote']['USD']['price'])
+except (ConnectionError, Timeout, TooManyRedirects) as e:
+    print('err', e)
