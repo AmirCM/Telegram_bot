@@ -1,4 +1,5 @@
 import logging
+from builtins import print
 
 from telegram import Update
 from telegram.ext import *
@@ -22,22 +23,32 @@ def post_reporter():
     post_text = ['📉 دلار', '📉 یورو', '📉 پوند انگلیس']
     sell = '👈 نرخ فروش: '
     buy = '👈🏼 خرید از مشتری: '
-    c.update_db()
+    c_prices = c.update_db()
+    rials = c.to_rial(c_prices.copy())
+    rials = {k: v for k, v in sorted(rials.items(), key=lambda item: item[1], reverse=True)}
     text = ''
     for i, p in enumerate(post_text):
         text += p + '\n' + sell + str(c.price[i]) + '\n' + buy + str(int(c.price[i] * 0.99)) + '\n\n'
-    if f:
-        f = False
-        return text + '\n @testerr'
-    else:
-        f = True
-        return text + '\n @tester'
+
+    text += '📌نرخ بروز ارزهای دیجیتال: '
+    text += '\nــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ\n'
+
+    emoji = '📉'
+    for k, v in rials.items():
+        text += emoji + ' نرخ ' + c_prices[k] + ' : ' + k + '\n' + sell + str(v) + '\n' + buy + str(
+            int(v * 0.99)) + '\n\n'
+
+    return text + '\n https://t.me/tester_bots_ahb'
 
 
 def alarm(context: CallbackContext):
     global message
-    c.update_db()
-    context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
+    try:
+        context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
+        print('Job Done')
+    except:
+        print('ERROR')
+        context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
 
 
 def all_msm(update: Update, context: CallbackContext) -> None:
