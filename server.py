@@ -25,7 +25,7 @@ def post_reporter():
     c.update_db()
     text = ''
     for i, p in enumerate(post_text):
-        text += p + '\n' + sell + str(c.price[i]) + '\n' + buy + str(int(c.price[i] * 0.99)) + '\n-------------------\n'
+        text += p + '\n' + sell + str(c.price[i]) + '\n' + buy + str(int(c.price[i] * 0.99)) + '\n\n'
     if f:
         f = False
         return text + '\n @testerr'
