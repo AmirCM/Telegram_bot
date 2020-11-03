@@ -1,10 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-dollar = 0
-eur = 1
-gbp = 2
-
 
 class Currency:
     def __init__(self):
@@ -30,6 +26,13 @@ class Currency:
 
 
 if __name__ == '__main__':
+    r = requests.get('https://www.binance.com/en')
+    soup = BeautifulSoup(r.text, features='lxml')
+    div = soup.find('div', class_='css-g1bq91')
+    btc = div.find('a', {'class': 'css-1u80pgg', 'href': '/en/trade/BTC_USDT'})
+    btc = btc.find_all('div', {'class': 'css-4cffwv'})
+    for b in btc:
+        print(b)
     c = Currency()
     c.update_db()
     print(c.price)

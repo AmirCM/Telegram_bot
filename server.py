@@ -2,6 +2,7 @@ import logging
 
 from telegram import Update
 from telegram.ext import *
+from main import Currency
 
 # Enable logging
 logging.basicConfig(
@@ -12,15 +13,31 @@ logger = logging.getLogger(__name__)
 
 started = False
 message = None
-i = 0
+f = False
+c = Currency()
+
+
+def post_reporter():
+    global f
+    post_text = ['📉 دلار', '📉 یورو', '📉 پوند انگلیس']
+    sell = '👈 نرخ فروش: '
+    buy = '👈🏼 خرید از مشتری: '
+    c.update_db()
+    text = ''
+    for i, p in enumerate(post_text):
+        text += p + '\n' + sell + str(c.price[i]) + '\n' + buy + str(int(c.price[i] * 0.99)) + '\n-------------------\n'
+    if f:
+        f = False
+        return text + '\n @testerr'
+    else:
+        f = True
+        return text + '\n @tester'
 
 
 def alarm(context: CallbackContext):
-    """Send the alarm message."""
-    global i, message
-    i += 1
-    print(context)
-    context.bot.editMessageText('Beep! ' + str(i), message['chat']['id'], message['message_id'])
+    global message
+    c.update_db()
+    context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
 
 
 def all_msm(update: Update, context: CallbackContext) -> None:
@@ -37,8 +54,8 @@ def start_updating(update: Update, context: CallbackContext) -> None:
             message = update['channel_post']
             print(message)
             print('started')
-            context.bot.editMessageText('BEEP@!@!', message['chat']['id'], message['message_id'])
-            context.job_queue.run_repeating(alarm, 5)
+            context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
+            context.job_queue.run_repeating(alarm, 60)
 
 
 with open('config.txt', 'r') as conf:
