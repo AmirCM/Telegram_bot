@@ -38,14 +38,16 @@ def post_reporter():
         text += emoji + ' نرخ ' + c_prices[k] + ' : ' + k + '\n' + sell + str(v) + '\n' + buy + str(
             int(v * 0.99)) + '\n\n'
 
-    return text + '\n https://t.me/tester_bots_ahb'
+    return text + '\n @keep_exchange \n$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
 
 
 def alarm(context: CallbackContext):
     global message
     try:
-        context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
-        print('Job Done')
+        txt = post_reporter()
+        print(txt)
+        context.bot.editMessageText(txt, message['chat']['id'], message['message_id'])
+
     except:
         print('ERROR')
         context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
@@ -66,7 +68,7 @@ def start_updating(update: Update, context: CallbackContext) -> None:
             print(message)
             print('started')
             context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
-            context.job_queue.run_repeating(alarm, 60)
+            context.job_queue.run_repeating(alarm, 120)
 
 
 with open('config.txt', 'r') as conf:
