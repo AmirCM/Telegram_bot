@@ -39,7 +39,7 @@ def post_reporter():
         text += emoji + ' نرخ ' + c_prices[k] + ' : ' + k + '\n' + sell + str(v) + '\n' + buy + str(
             int(v * 0.99)) + '\n\n'
 
-    return text + '\n @keep_exchange \n$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+    return text + '\n @keep_exchange \n'
 
 
 def alarm(context: CallbackContext):

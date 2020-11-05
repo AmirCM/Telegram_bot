@@ -53,7 +53,6 @@ class Currency:
                 for cryp, val in self.crypto.items():
                     if re.match(val, a.text):
                         key = cryp
-                        print(cryp, val, a.text)
                         break
             elif i % 4 == 1 and key:
                 c_price[key] = a.text
