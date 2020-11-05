@@ -1,14 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 
 class Currency:
     def __init__(self):
         self.url = ['https://www.tgju.org/', 'https://coinmarketcap.com/']
         self.price = [0, 0, 0]
-        self.crypto = {'BTC': 'Bitcoin1BTC', 'ETH': 'Ethereum2ETH',
-                       'XMR': 'Monero14XMR', 'DASH': 'Dash30DASH', 'LTC': 'Litecoin8LTC', 'USDT': 'Tether3USDT',
-                       'ADA': 'Cardano11ADA', 'TRX': 'TRON15TRX'}
+        self.crypto = {'BTC': r'^Bitcoin\d{1,2}BTC$',
+                       'ETH': r'^Ethereum\d{1,2}ETH$',
+                       'XMR': r'^Monero\d{1,2}XMR$',
+                       'DASH': r'^Dash30DASH$',
+                       'LTC': r'^Litecoin\d{1,2}LTC$',
+                       'USDT': r'^Tether\d{1,2}USDT$',
+                       'ADA': r'^Cardano\d{1,2}ADA$',
+                       'TRX': r'^TRON\d{1,2}TRX$'}
 
         self.c_keys = ['price_dollar_rl', 'price_eur', 'price_gbp']
 
@@ -39,18 +45,18 @@ class Currency:
         r = requests.get(self.url[1])
         soup = BeautifulSoup(r.text, features='lxml')
         table = soup.find('table', class_='cmc-table cmc-table___11lFC cmc-table-homepage___2_guh')
-        prices = ['Bitcoin1BTC', 'Ethereum2ETH',
-                  'TRON15TRX', 'Dash30DASH', 'Litecoin8LTC', 'Cardano11ADA',
-                  'Monero14XMR', 'Tether3USDT']
         key = False
         c_price = {}
+
         for i, a in enumerate(table.find_all('a')):
-            if i % 4 == 0 and a.text in prices:
-                key = a.text
+            if i % 4 == 0:
+                for cryp, val in self.crypto.items():
+                    if re.match(val, a.text):
+                        key = cryp
+                        print(cryp, val, a.text)
+                        break
             elif i % 4 == 1 and key:
-                for k, v in self.crypto.items():
-                    if v == key:
-                        c_price[k] = a.text
+                c_price[key] = a.text
                 key = False
 
         return c_price
