@@ -13,7 +13,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 started = False
-message = None
+message_id = ''
+chat_id = ''
 f = False
 c = Currency()
 
@@ -42,33 +43,41 @@ def post_reporter():
 
 
 def alarm(context: CallbackContext):
-    global message
+    global chat_id
+    txt = ''
     try:
         txt = post_reporter()
         print(txt)
-        context.bot.editMessageText(txt, message['chat']['id'], message['message_id'])
-
+        context.bot.send_message(chat_id, txt)
     except:
         print('ERROR')
-        context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
+        context.bot.send_message(chat_id, txt)
 
 
 def all_msm(update: Update, context: CallbackContext) -> None:
-    # print(context.bot.editMessageText())
     print(update.effective_chat)
     print(update)
 
 
-def start_updating(update: Update, context: CallbackContext) -> None:
-    global started, message
+def command_handler(update: Update, context: CallbackContext) -> None:
+    global started, message_id, chat_id
     if update.effective_chat.type == 'channel':
-        if update['channel_post']['text'] == '/st_up':
+        if update['channel_post']['text'] == '/st_up079' and started is False:
             started = True
-            message = update['channel_post']
-            print(message)
+            msg = update['channel_post']
+            print(msg)
+            message_id = msg['message_id']
+            chat_id = msg['chat']['id']
             print('started')
-            context.bot.editMessageText(post_reporter(), message['chat']['id'], message['message_id'])
-            context.job_queue.run_repeating(alarm, 120)
+            context.bot.editMessageText(post_reporter(), chat_id, message_id)
+            context.job_queue.run_repeating(alarm, 60)
+        elif update['channel_post']['text'] == '/resetup' and started:
+            started = False
+            msg = update['channel_post']
+            print(msg)
+            message_id = msg['message_id']
+            chat_id = msg['chat']['id']
+            context.bot.delete_message(chat_id, message_id)
 
 
 with open('config.txt', 'r') as conf:
@@ -79,7 +88,7 @@ updater = Updater(token)
 dispatcher = updater.dispatcher
 
 # on different commands - answer in Telegram
-dispatcher.add_handler(MessageHandler(Filters.command, start_updating))
+dispatcher.add_handler(MessageHandler(Filters.command, command_handler))
 dispatcher.add_handler(MessageHandler(Filters.text, all_msm))
 
 # Start the Bot
