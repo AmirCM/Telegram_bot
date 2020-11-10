@@ -1,6 +1,6 @@
 import logging
 from builtins import print
-
+import jdatetime
 from telegram import Update
 from telegram.ext import *
 from main import Currency
@@ -19,6 +19,17 @@ f = False
 c = Currency()
 
 
+def separator(p: str):
+    i = 3 - len(p) % 3
+    rs = ''
+    for j, ch in enumerate(p):
+        if (j + i) % 3 == 0 and j != 0:
+            rs += ',' + ch
+        else:
+            rs += ch
+    return rs
+
+
 def post_reporter():
     global f
     post_text = ['📉 دلار', '📉 یورو', '📉 پوند انگلیس']
@@ -27,17 +38,19 @@ def post_reporter():
     c_prices = c.update_db()
     rials = c.to_rial(c_prices.copy())
     rials = {k: v for k, v in sorted(rials.items(), key=lambda item: item[1], reverse=True)}
-    text = ''
+    x = jdatetime.datetime.now()
+    text = x.strftime('%c') + '\n'
     for i, p in enumerate(post_text):
-        text += p + '\n' + sell + str(c.price[i]) + '\n' + buy + str(int(c.price[i] * 0.99)) + '\n\n'
+        text += p + '\n' + sell + separator(str(c.price[i])) + '\n' + buy + \
+                separator(str(int(c.price[i] * 0.99))) + '\n\n'
 
     text += '📌نرخ بروز ارزهای دیجیتال: '
     text += '\nــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ\n'
 
     emoji = '📉'
     for k, v in rials.items():
-        text += emoji + ' نرخ ' + c_prices[k] + ' : ' + k + '\n' + sell + str(v) + '\n' + buy + str(
-            int(v * 0.99)) + '\n\n'
+        text += emoji + ' نرخ ' + c_prices[k] + ' : ' + k + '\n' + sell + separator(str(v)) + '\n' + buy + separator(
+            str(int(v * 0.99))) + '\n\n'
 
     return text + '\n @keep_exchange \n'
 
@@ -51,7 +64,6 @@ def alarm(context: CallbackContext):
         context.bot.send_message(chat_id, txt)
     except:
         print('ERROR')
-        context.bot.send_message(chat_id, txt)
 
 
 def all_msm(update: Update, context: CallbackContext) -> None:
@@ -70,7 +82,7 @@ def command_handler(update: Update, context: CallbackContext) -> None:
             chat_id = msg['chat']['id']
             print('started')
             context.bot.editMessageText(post_reporter(), chat_id, message_id)
-            context.job_queue.run_repeating(alarm, 480)
+            context.job_queue.run_repeating(alarm, 120)
         elif update['channel_post']['text'] == '/resetup$' and started:
             started = False
             msg = update['channel_post']
