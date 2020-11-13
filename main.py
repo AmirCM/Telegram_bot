@@ -1,34 +1,30 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from selenium import webdriver
-
-browser = webdriver.Chrome()
+import json
 
 
 class Currency:
     def __init__(self):
-        self.url = ['https://www.tgju.org/', 'https://coinmarketcap.com/', 'https://coinmarketcap.com/2/',
-                    'https://coinmarketcap.com/3/']
+        self.url = ['https://www.tgju.org/', 'https://web-api.coinmarketcap.com/v1/cryptocurrency/'
+                                             'listings/latest?aux=circulating_supply,max_supply,total_'
+                                             'supply&convert=USD&cryptocurrency_type=all&limit=100&sort=market'
+                                             '_cap&sort_dir=desc&start=1']
         self.price = [0, 0, 0]
-        self.crypto = {'BTC': r'^Bitcoin\d{1,2}BTC$',
-                       'ETH': r'^Ethereum\d{1,2}ETH$',
-                       'XMR': r'^Monero\d{1,2}XMR$',
-                       'DASH': r'^Dash30DASH$',
-                       'LTC': r'^Litecoin\d{1,2}LTC$',
-                       'USDT': r'^Tether\d{1,2}USDT$',
-                       'ADA': r'^Cardano\d{1,2}ADA$',
-                       'TRX': r'^TRON\d{1,2}TRX$'}
+        self.crypto = {'Bitcoin': 'BTC',
+                       'Ethereum': 'ETH',
+                       'Monero': 'XMR',
+                       'Dash': 'DASH',
+                       'Litecoin': 'LTC',
+                       'Tether': 'USDT',
+                       'Cardano': 'ADA',
+                       'TRON': 'TRX'}
 
         self.c_keys = ['price_dollar_rl', 'price_eur', 'price_gbp']
 
     def to_rial(self, c_prices):
         for k, v in c_prices.items():
-            v = v.split('$')[1].split(',')
-            if len(v) > 1:
-                v = v[0] + v[1]
-            else:
-                v = v[0]
+            v = v.split('$')[1]
             c_prices[k] = int(float(v) * self.price[0])
         return c_prices
 
@@ -46,29 +42,18 @@ class Currency:
                 ',')
             self.price[i] = int(price[0]) * 100 + int(price[1]) // 10
 
-        browser.get(self.url[1])
-        browser.execute_script('window.scrollBy(0,document.body.scrollHeight)')
-        html = browser.page_source
-        soup = BeautifulSoup(html, features='lxml')
-        table = soup.find('table', class_='cmc-table cmc-table___11lFC cmc-table-homepage___2_guh')
-
-        key = False
+        r = requests.get(self.url[1])
+        data = json.loads(r.text)
+        data = data['data']
         c_price = {}
-        for i, a in enumerate(table.find_all('a')):
-            if i % 4 == 0:
-                for cryp, val in self.crypto.items():
-                    if re.match(val, a.text):
-                        key = cryp
-                        break
-            elif i % 4 == 1 and key:
-                c_price[key] = a.text
-                key = False
-
-        print(c_price)
+        for d in data:
+            if d['name'] in self.crypto:
+                print(d['name'], d['quote']['USD']['price'])
+                c_price[self.crypto[d['name']]] = '$' + str(d['quote']['USD']['price'])
         return c_price
 
 
 if __name__ == '__main__':
     c = Currency()
-    pr = c.update_db()
-    c.update_db()
+    prices = c.update_db()
+    print(prices)

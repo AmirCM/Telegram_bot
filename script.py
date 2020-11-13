@@ -6,5 +6,7 @@ url = 'https://web-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?aux=c
 r = requests.get(url)
 data = json.loads(r.text)
 cpy = data['data']
+storage = []
 for i, l in enumerate(cpy):
     print(i, l['name'], l['quote']['USD']['price'])
+

@@ -37,6 +37,7 @@ def post_reporter():
     buy = '👈🏼 خرید از مشتری: '
     c_prices = c.update_db()
     rials = c.to_rial(c_prices.copy())
+
     rials = {k: v for k, v in sorted(rials.items(), key=lambda item: item[1], reverse=True)}
     x = jdatetime.datetime.now()
     text = 'تاریخ: ' + x.strftime('%x') + '\n' + 'ساعت: ' + x.strftime('%X') + '\n'
