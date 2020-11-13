@@ -1,11 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+from selenium import webdriver
+
+browser = webdriver.Chrome()
 
 
 class Currency:
     def __init__(self):
-        self.url = ['https://www.tgju.org/', 'https://coinmarketcap.com/']
+        self.url = ['https://www.tgju.org/', 'https://coinmarketcap.com/', 'https://coinmarketcap.com/2/',
+                    'https://coinmarketcap.com/3/']
         self.price = [0, 0, 0]
         self.crypto = {'BTC': r'^Bitcoin\d{1,2}BTC$',
                        'ETH': r'^Ethereum\d{1,2}ETH$',
@@ -42,12 +46,14 @@ class Currency:
                 ',')
             self.price[i] = int(price[0]) * 100 + int(price[1]) // 10
 
-        r = requests.get(self.url[1])
-        soup = BeautifulSoup(r.text, features='lxml')
+        browser.get(self.url[1])
+        browser.execute_script('window.scrollBy(0,document.body.scrollHeight)')
+        html = browser.page_source
+        soup = BeautifulSoup(html, features='lxml')
         table = soup.find('table', class_='cmc-table cmc-table___11lFC cmc-table-homepage___2_guh')
+
         key = False
         c_price = {}
-
         for i, a in enumerate(table.find_all('a')):
             if i % 4 == 0:
                 for cryp, val in self.crypto.items():
@@ -58,11 +64,11 @@ class Currency:
                 c_price[key] = a.text
                 key = False
 
+        print(c_price)
         return c_price
 
 
 if __name__ == '__main__':
     c = Currency()
     pr = c.update_db()
-    print(c.to_rial(pr.copy()))
-    print(pr)
+    c.update_db()
