@@ -50,7 +50,7 @@ def post_reporter():
 
     rials = {k: v for k, v in sorted(rials.items(), key=lambda item: item[1], reverse=True)}
     x = jdatetime.datetime.now()
-    text = 'تاریخ: ' + x.strftime('%x') + '\n' + 'ساعت: ' + x.strftime('%X') + '\n'
+    text = '📅 تاریخ: ' + x.strftime('%x') + '\n' + '⏰ ساعت: ' + x.strftime('%X') + '\n'
     for i, p in enumerate(post_text):
         text += p + '\n' + sell + separator(str(c.price[i])) + '\n' + buy + \
                 separator(str(int(c.price[i] * 0.99))) + '\n\n'
