@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 import json
 
 
@@ -24,7 +23,6 @@ class Currency:
 
     def to_rial(self, c_prices):
         for k, v in c_prices.items():
-            v = v.split('$')[1]
             c_prices[k] = int(float(v) * self.price[0])
         return c_prices
 
@@ -48,8 +46,7 @@ class Currency:
         c_price = {}
         for d in data:
             if d['name'] in self.crypto:
-                print(d['name'], d['quote']['USD']['price'])
-                c_price[self.crypto[d['name']]] = '$' + str(d['quote']['USD']['price'])
+                c_price[self.crypto[d['name']]] = str(d['quote']['USD']['price'])
         return c_price
 
 

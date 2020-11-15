@@ -32,6 +32,16 @@ def separator(p: str):
 
 def post_reporter():
     global f
+
+    persian = {'BTC': 'بیت کوین',
+               'ETH': 'اتریوم',
+               'XMR': 'مونرو',
+               'DASH': 'دش',
+               'LTC': 'لیت کوین',
+               'USDT': 'تتر',
+               'ADA': 'کاردانو',
+               'TRX': 'ترون'}
+
     post_text = ['📉 دلار', '📉 یورو', '📉 پوند انگلیس']
     sell = '👈 نرخ فروش: '
     buy = '👈🏼 خرید از مشتری: '
@@ -50,7 +60,9 @@ def post_reporter():
 
     emoji = '📉'
     for k, v in rials.items():
-        text += emoji + ' نرخ ' + c_prices[k] + ' : ' + k + '\n' + sell + separator(str(v)) + '\n' + buy + separator(
+        text += emoji + '\t' + persian[k] + ' (' + k + ') : ' + '$' + str(
+            round(float(c_prices[k]), 3)) + '\n' + sell + separator(
+            str(v)) + '\n' + buy + separator(
             str(int(v * 0.99))) + '\n\n'
 
     return text + '\n @keep_exchange \n'
@@ -58,10 +70,8 @@ def post_reporter():
 
 def alarm(context: CallbackContext):
     global chat_id
-    txt = ''
     try:
         txt = post_reporter()
-        print(txt)
         context.bot.send_message(chat_id, txt)
     except:
         print('ERROR')
