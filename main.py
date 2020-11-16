@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+from script import get_tether
 
 
 class Currency:
@@ -22,10 +23,14 @@ class Currency:
         self.c_keys = ['price_dollar_rl', 'price_eur', 'price_gbp']
 
     def to_rial(self, c_prices):
-        for k, v in c_prices.items():
-            c_prices[k] = int(float(v) * self.price[0])
+        tether = get_tether()
+        tether = tether.split(',')
+        tether = int(tether[0] + tether[1])
 
-        c_prices['USDT'] = int(float(c_prices['USDT']) * 1.008)
+        for k, v in c_prices.items():
+            c_prices[k] = int(float(v) * tether)
+
+        c_prices['USDT'] = tether
         return c_prices
 
     def update_db(self):
@@ -50,7 +55,7 @@ class Currency:
             if d['name'] in self.crypto:
                 c_price[self.crypto[d['name']]] = str(d['quote']['USD']['price'])
 
-        #c_price['USDT'] = str(1 + round(float(c_price['USDT']) - int(float(c_price['USDT'])), 5) * 10)
+        # c_price['USDT'] = str(1 + round(float(c_price['USDT']) - int(float(c_price['USDT'])), 5) * 10)
         return c_price
 
 

@@ -4,6 +4,7 @@ import jdatetime
 from telegram import Update
 from telegram.ext import *
 from main import Currency
+from unidecode import unidecode
 
 # Enable logging
 logging.basicConfig(
@@ -33,14 +34,14 @@ def separator(p: str):
 def post_reporter():
     global f
 
-    persian = {'BTC': 'بیت کوین',
-               'ETH': 'اتریوم',
-               'XMR': 'مونرو',
-               'DASH': 'دش',
-               'LTC': 'لیت کوین',
-               'USDT': 'تتر',
-               'ADA': 'کاردانو',
-               'TRX': 'ترون'}
+    persian = {'BTC': 'بیت‌کوین (BTC)‏',
+               'ETH': 'اتریوم (ETH)‏ ',
+               'XMR': ' مونرو (XMR)‏ ',
+               'DASH': ' دش (DASH)‏ ',
+               'LTC': 'لایت کوین (LTC)‏ ',
+               'USDT': ' تتر (USDT)‏ ',
+               'ADA': 'کاردانو (ADA)‏ ',
+               'TRX': ' ترون (TRX)‏ '}
 
     post_text = ['📉 دلار', '📉 یورو', '📉 پوند انگلیس']
     sell = '👈 نرخ فروش: '
@@ -61,10 +62,10 @@ def post_reporter():
 
     emoji = '📉'
     for k, v in rials.items():
-        text += emoji + '\t' + persian[k] + ' (' + k + ') : ' + '$' + str(
-            round(float(c_prices[k]), 3)) + '\n' + sell + separator(
-            str(v)) + '\n' + buy + separator(
-            str(int(v * 0.99))) + '\n\n'
+        text += emoji + '\t' + persian[k] + ':'
+        text += str(round(float(c_prices[k]), 3)) + '$' + '\n'
+        text += sell + separator(str(v)) + '\n'
+        text += buy + separator(str(int(v * 0.99))) + '\n\n'
 
     return text + '\n @keep_exchange \n'
 
