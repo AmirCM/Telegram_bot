@@ -24,6 +24,8 @@ class Currency:
     def to_rial(self, c_prices):
         for k, v in c_prices.items():
             c_prices[k] = int(float(v) * self.price[0])
+
+        c_prices['USDT'] = int(float(c_prices['USDT']) * 1.008)
         return c_prices
 
     def update_db(self):
@@ -47,10 +49,14 @@ class Currency:
         for d in data:
             if d['name'] in self.crypto:
                 c_price[self.crypto[d['name']]] = str(d['quote']['USD']['price'])
+
+        #c_price['USDT'] = str(1 + round(float(c_price['USDT']) - int(float(c_price['USDT'])), 5) * 10)
         return c_price
 
 
 if __name__ == '__main__':
     c = Currency()
     prices = c.update_db()
-    print(prices)
+    rial = c.to_rial(prices.copy())
+    rial['USDT'] = str(float(rial['USDT']) * 1.008)
+    print(rial['USDT'])
