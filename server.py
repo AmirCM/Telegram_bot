@@ -18,7 +18,7 @@ message_id = ''
 chat_id = ''
 f = False
 c = Currency()
-
+counter = 0
 
 def separator(p: str):
     i = 3 - len(p) % 3
@@ -71,6 +71,9 @@ def post_reporter():
 
 
 def alarm(context: CallbackContext):
+    global counter
+    counter += 1
+    print('Handler: {}'.format(counter))
     global chat_id
     try:
         txt = post_reporter()

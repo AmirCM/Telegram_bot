@@ -1,20 +1,29 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from unidecode import unidecode
+from requests_html import HTMLSession
 
 
 def get_page_data():
-    url = 'https://wallex.ir/'
+
+
+    """
     with webdriver.Chrome() as driver:
         driver.get(url)
         source = driver.page_source
-    return source
+        """
+
+    return 'None'
 
 
 def get_tether():
-    source = get_page_data()
-    soup = BeautifulSoup(source, features='lxml')
-    price = soup.findAll('strong')
+    url = 'https://wallex.ir/'
+
+    session = HTMLSession()
+    r = session.get(url)
+    r.html.render()
+    price = r.html.find('strong')
     return unidecode(price[5].text)
 
 
+print(get_tether())
