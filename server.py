@@ -20,6 +20,7 @@ f = False
 c = Currency()
 counter = 0
 
+
 def separator(p: str):
     i = 3 - len(p) % 3
     rs = ''

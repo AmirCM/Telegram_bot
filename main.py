@@ -2,10 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from script import get_tether
+from requests_html import HTMLSession
 
 
 class Currency:
     def __init__(self):
+        self.session = HTMLSession()
+        self.session.browser
         self.url = ['https://www.tgju.org/', 'https://web-api.coinmarketcap.com/v1/cryptocurrency/'
                                              'listings/latest?aux=circulating_supply,max_supply,total_'
                                              'supply&convert=USD&cryptocurrency_type=all&limit=100&sort=market'
@@ -23,7 +26,7 @@ class Currency:
         self.c_keys = ['price_dollar_rl', 'price_eur', 'price_gbp']
 
     def to_rial(self, c_prices):
-        tether = get_tether()
+        tether = get_tether(self.session)
         tether = tether.split(',')
         tether = int(tether[0] + tether[1])
 
