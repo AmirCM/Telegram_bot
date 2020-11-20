@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-from script import get_tether
+from script import get_page_data
 from requests_html import HTMLSession
 
 
@@ -26,7 +26,7 @@ class Currency:
         self.c_keys = ['price_dollar_rl', 'price_eur', 'price_gbp']
 
     def to_rial(self, c_prices):
-        tether = get_tether(self.session)
+        tether = get_page_data()
         tether = tether.split(',')
         tether = int(tether[0] + tether[1])
 

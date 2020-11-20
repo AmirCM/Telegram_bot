@@ -1,6 +1,7 @@
 import logging
 from builtins import print
 import jdatetime
+import time
 from telegram import Update
 from telegram.ext import *
 from main import Currency
@@ -33,8 +34,9 @@ def separator(p: str):
 
 
 def post_reporter():
+    print('Reporting started')
+    tic = time.perf_counter()
     global f
-
     persian = {'BTC': 'بیت‌کوین (BTC)‏',
                'ETH': 'اتریوم (ETH)‏ ',
                'XMR': ' مونرو (XMR)‏ ',
@@ -67,11 +69,12 @@ def post_reporter():
         text += str(round(float(c_prices[k]), 3)) + '$' + '\n'
         text += sell + separator(str(v)) + '\n'
         text += buy + separator(str(int(v * 0.99))) + '\n\n'
-
+    print('Reporting elapse time {:.2f}'.format(time.perf_counter() - tic))
     return text + '\n @keep_exchange \n'
 
 
 def alarm(context: CallbackContext):
+    print('Instance {} is running'.format(context.job))
     global counter
     counter += 1
     print('Handler: {}'.format(counter))
@@ -81,6 +84,7 @@ def alarm(context: CallbackContext):
         context.bot.send_message(chat_id, txt)
     except:
         print('ERROR')
+    print('Instance {} is ended'.format(context.job))
 
 
 def all_msm(update: Update, context: CallbackContext) -> None:
@@ -99,7 +103,7 @@ def command_handler(update: Update, context: CallbackContext) -> None:
             chat_id = msg['chat']['id']
             print('started')
             context.bot.editMessageText(post_reporter(), chat_id, message_id)
-            context.job_queue.run_repeating(alarm, 120)
+            context.job_queue.run_repeating(alarm, 90)
         elif update['channel_post']['text'] == '/resetup$' and started:
             started = False
             msg = update['channel_post']
