@@ -103,7 +103,7 @@ def command_handler(update: Update, context: CallbackContext) -> None:
             chat_id = msg['chat']['id']
             print('started')
             context.bot.editMessageText(post_reporter(), chat_id, message_id)
-            context.job_queue.run_repeating(alarm, 90)
+            context.job_queue.run_repeating(alarm, 300)
         elif update['channel_post']['text'] == '/resetup$' and started:
             started = False
             msg = update['channel_post']

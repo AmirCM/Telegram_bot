@@ -4,29 +4,27 @@ from unidecode import unidecode
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 
 
 def get_page_data():
-    tic = time.perf_counter()
     url = 'https://wallex.ir/'
-    browser = webdriver.PhantomJS()
-    browser.get(url)
-    html = browser.page_source
+    driver = webdriver.PhantomJS()
+
+    #executor_url = driver.command_executor._url
+    #session_id = driver.session_id
+
+    #print(session_id)
+    #print(executor_url)
+
+    driver.get(url)
+    html = driver.page_source
     soup = BeautifulSoup(html, 'lxml')
     prices = soup.find_all('strong')
-    print('Tether elapse time {:.2f}'.format(time.perf_counter() - tic))
+
     return unidecode(prices[5].text)
-
-
-
-def get_tether(session: HTMLSession):
-    tic = time.perf_counter()
-    print('Tether stated')
-    url = 'https://wallex.ir/'
-    r = session.get(url)
-    r.html.render(timeout=50, sleep=0)
-    price = r.html.find('strong')
-    print('Tether elapse time {:.2f}'.format(time.perf_counter() - tic))
-    return unidecode(price[5].text)
-
 
