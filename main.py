@@ -31,7 +31,7 @@ class Currency:
         for k, v in c_prices.items():
             c_prices[k] = int(float(v) * tether)
 
-        c_prices['USDT'] = tether
+        c_prices['USDT'] = int(tether//10)
         return c_prices
 
     def update_db(self):

@@ -19,16 +19,11 @@ def get_page_data2():
 """
 
 def get_page_data():
-    url = 'https://www.cryptoland.com/fa'
-    driver = webdriver.Chrome()
-    driver.get(url)
-    driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'lxml')
-    coin_section = soup.find('section', class_='coins-section')
-    prices = coin_section.findAll('span')
-    print(prices[16].text)
-    driver.quit()
-    return prices[16].text
+    data = {
+        "srcCurrency": "usdt", "dstCurrency": "rls"
+    }
+    r = requests.post('https://api.nobitex.ir/market/stats', data=data)
+    tether = int(float(r.json()['stats']['usdt-rls']['latest']) // 10)
+    return tether
 
 
