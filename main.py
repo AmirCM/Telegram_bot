@@ -24,14 +24,12 @@ class Currency:
 
     def to_rial(self, c_prices):
         tether = get_page_data()
-        tether = tether.split(',')
-        tether = (int(tether[0] + tether[1])*1.01)//10
         print(tether)
 
         for k, v in c_prices.items():
             c_prices[k] = int(float(v) * tether)
 
-        c_prices['USDT'] = int(tether//10)
+        c_prices['USDT'] = int(tether)
         return c_prices
 
     def update_db(self):
