@@ -6,6 +6,7 @@ from telegram import Update
 from telegram.ext import *
 from main import Currency
 from unidecode import unidecode
+import pytz
 
 # Enable logging
 logging.basicConfig(
@@ -53,9 +54,9 @@ def post_reporter():
     rials = c.to_rial(c_prices.copy())
 
     rials = {k: v for k, v in sorted(rials.items(), key=lambda item: item[1], reverse=True)}
-
-    x = jdatetime.datetime.now()
-    text = '📅 تاریخ: ' + x.strftime('%x') + '\n' + '⏰ ساعت: ' + x.strftime('%X') + '\n'
+    tz = pytz.timezone('Iran')
+    x = jdatetime.datetime.now(tz)
+    text = '📅 تاریخ: ' + x.strftime('%Y/%-m/%-d') + '\n' + '⏰ ساعت: ' + x.strftime('%X') + '\n'
     for i, p in enumerate(post_text):
         text += p + '\n' + sell + separator(str(c.price[i])) + '\n' + buy + \
                 separator(str(int(c.price[i] * 0.99))) + '\n\n'
@@ -127,3 +128,4 @@ dispatcher.add_handler(MessageHandler(Filters.text, all_msm))
 # Start the Bot
 updater.start_polling()
 updater.idle()
+
