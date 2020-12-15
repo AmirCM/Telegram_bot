@@ -95,7 +95,7 @@ def all_msm(update: Update, context: CallbackContext) -> None:
 
 def command_handler(update: Update, context: CallbackContext) -> None:
     global started, message_id, chat_id
-    if update.effective_chat.type == 'channel':
+    if update.effective_chat.type == 'channel' and update.effective_chat.username == 'keep_exchange':
         if update['channel_post']['text'] == '/st_up079' and started is False:
             started = True
             msg = update['channel_post']
@@ -112,6 +112,7 @@ def command_handler(update: Update, context: CallbackContext) -> None:
             message_id = msg['message_id']
             chat_id = msg['chat']['id']
             context.bot.delete_message(chat_id, message_id)
+            context.job_queue.stop()
 
 
 with open('config.txt', 'r') as conf:
@@ -128,4 +129,3 @@ dispatcher.add_handler(MessageHandler(Filters.text, all_msm))
 # Start the Bot
 updater.start_polling()
 updater.idle()
-
