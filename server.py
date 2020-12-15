@@ -95,24 +95,25 @@ def all_msm(update: Update, context: CallbackContext) -> None:
 
 def command_handler(update: Update, context: CallbackContext) -> None:
     global started, message_id, chat_id
+    text = update['channel_post']['text']
+    msg = update['channel_post']
     if update.effective_chat.type == 'channel' and update.effective_chat.username == 'keep_exchange':
-        if update['channel_post']['text'] == '/st_up079' and started is False:
+        if (text == '/st_upT60' or text == '/st_upT300') and started is False:
             started = True
-            msg = update['channel_post']
-            print(msg)
             message_id = msg['message_id']
             chat_id = msg['chat']['id']
-            print('started')
+            print('Started')
             context.bot.editMessageText(post_reporter(), chat_id, message_id)
-            context.job_queue.run_repeating(alarm, 60)
+            t = int(text.split('T')[1])
+            print(t)
+            context.job_queue.run_repeating(alarm, t)
         elif update['channel_post']['text'] == '/resetup$' and started:
             started = False
-            msg = update['channel_post']
-            print(msg)
             message_id = msg['message_id']
             chat_id = msg['chat']['id']
             context.bot.delete_message(chat_id, message_id)
             context.job_queue.stop()
+            print('Stopped')
 
 
 with open('config.txt', 'r') as conf:
